@@ -1,5 +1,3 @@
-# Delivery-Service-Data-Analysis
-
 # SQL Data Analysis: Order Acceptance, Customer Support Trends, and User Behavior
 
 ## Overview
