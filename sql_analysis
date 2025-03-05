@@ -1,0 +1,91 @@
+-- Q1: What types of orders are accepted the most by couriers during peak hours? How can we maximize the amount of orders accepted based on this data?
+
+-- Initial exploration to understand table structure
+SELECT * 
+FROM data_analysis.orders_table 
+LIMIT 10;
+
+-- Checking distinct time periods for order distribution
+SELECT DISTINCT meal_time_category 
+FROM data_analysis.orders_table;
+
+-- Counting total orders by meal time category
+SELECT 
+    meal_time_category, 
+    COUNT(*) AS total_orders
+FROM data_analysis.orders_table
+GROUP BY meal_time_category
+ORDER BY total_orders DESC;
+
+-- Identifying popular product categories for peak time
+SELECT 
+    product_category, 
+    COUNT(*) AS total_orders
+FROM data_analysis.orders_table
+WHERE meal_time_category = 'Meal Time A' 
+  AND accepted_time IS NOT NULL -- Only includes accepted orders
+GROUP BY product_category
+ORDER BY total_orders DESC;
+
+-- Calculating acceptance rates by meal time category
+SELECT 
+    o.meal_time_category,
+    COUNT_IF(is_accepted) / COUNT(*) AS acceptance_rate
+FROM data_analysis.assignments_table a
+INNER JOIN data_analysis.orders_table o 
+    ON a.order_id = o.order_id
+GROUP BY o.meal_time_category;
+
+-- To optimize performance, different strategies can be explored based on meal time variations and courier preferences.
+
+-- Q2: What is the correlation between batched orders and customer support inquiries? How can we minimize potential challenges?
+
+-- Joining orders with support contacts
+SELECT 
+    o.*, 
+    s.*
+FROM data_analysis.orders_table o
+JOIN data_analysis.support_contacts s
+    ON o.order_id = s.order_id;
+
+-- Filtering for fulfilled batched orders
+SELECT 
+    o.*, 
+    s.*
+FROM data_analysis.orders_table o
+JOIN data_analysis.support_contacts s
+    ON o.order_id = s.order_id
+WHERE o.is_fulfilled = 1 
+  AND o.is_batched = TRUE;
+
+-- Counting unique orders per contact reason
+SELECT 
+    s.contact_reason, 
+    COUNT(DISTINCT o.order_id) AS order_count
+FROM data_analysis.orders_table o
+JOIN data_analysis.support_contacts s
+    ON o.order_id = s.order_id
+WHERE o.is_fulfilled = 1 
+  AND o.is_batched = TRUE
+GROUP BY s.contact_reason
+ORDER BY order_count DESC;
+
+-- Various factors contribute to customer interactions, and a deeper analysis of operational workflows may help identify opportunities for improvement.
+
+Q3: Which devices are the majority of our customers using? How can we optimize the user experience based on this insight?
+
+-- Exploring session data
+SELECT * 
+FROM data_analysis.customer_sessions 
+LIMIT 10;
+
+-- Counting sessions by device type
+SELECT 
+    device_type, 
+    COUNT(*) AS session_count,
+    ROUND((COUNT(*) * 100.0) / SUM(COUNT(*)) OVER (), 2) AS percentage
+FROM data_analysis.customer_sessions
+GROUP BY device_type
+ORDER BY session_count DESC;
+
+-- Device usage trends offer insights into customer engagement and platform-specific optimizations.
