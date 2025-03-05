@@ -37,21 +37,3 @@ INNER JOIN data_analysis.orders_table o
 GROUP BY o.meal_time_category;
 
 -- To optimize performance, different strategies can be explored based on meal time variations and courier preferences.
-
-Q3: Which devices are the majority of our customers using? How can we optimize the user experience based on this insight?
-
--- Exploring session data
-SELECT * 
-FROM data_analysis.customer_sessions 
-LIMIT 10;
-
--- Counting sessions by device type
-SELECT 
-    device_type, 
-    COUNT(*) AS session_count,
-    ROUND((COUNT(*) * 100.0) / SUM(COUNT(*)) OVER (), 2) AS percentage
-FROM data_analysis.customer_sessions
-GROUP BY device_type
-ORDER BY session_count DESC;
-
--- Device usage trends offer insights into customer engagement and platform-specific optimizations.
